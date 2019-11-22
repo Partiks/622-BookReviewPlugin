@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">APK_AR_Image_1</string>
+    <string name="partiks_hello">PARTIKS</string>
+    <string name="planet">APK EARTH</string>
+     <!-- <string name="book_who_will_cry"><a href="https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die">Goodreads review </a></string> -->
+    <string name="book_who_will_cry">"https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die"</string>
+</resources>

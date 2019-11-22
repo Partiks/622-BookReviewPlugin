@@ -1,0 +1,3 @@
+earth.jpg|/home/partiks/Documents/ar_images/earth.jpg
+niagara-falls.jpg|/home/partiks/Documents/ar_images/niagara-falls.jpg
+who-will-cry-when-you-die.jpg|/home/partiks/Documents/ar_images/who-will-cry-when-you-die.jpg|0.12
