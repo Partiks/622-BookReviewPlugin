@@ -43,6 +43,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashSet;
 
 public class FrameOperations {
 
@@ -50,6 +51,8 @@ public class FrameOperations {
     ArFragment arFragment;
     Resources dynamicResources;
     Context context;
+    private HashSet<AnchorNode> pluginObjects;
+
     Boolean shouldAddModel=true;
     private ViewRenderable textRenderable;
     private ViewRenderable textRenderable2;
@@ -57,11 +60,12 @@ public class FrameOperations {
     Node bookInfoNode;
 
 
-    public FrameOperations(Resources dynamicResources2, ArFragment arFragment2){
+    public FrameOperations(Resources dynamicResources2, ArFragment arFragment2, HashSet<AnchorNode> pluginObjects){
         this.arFragment = arFragment2;
         context=arFragment.getContext();
         //context = arFragment.getContext();
         dynamicResources = dynamicResources2;
+        this.pluginObjects = pluginObjects;
 
         int layoutId = dynamicResources.getIdentifier("text_view", "layout", "edu.buffalo.cse622.plugins");
         XmlResourceParser textViewXml = dynamicResources.getLayout(layoutId);
@@ -100,9 +104,10 @@ public class FrameOperations {
 
     }
 
-    private Node processFrame(Frame frame) {
+    private void processFrame(Frame frame) {
         Log.e(PTAG, "///////////////////////////////////// PROCESS FRAME IN PLUGIN CALLED");
-        Node resultNode=null;
+        AnchorNode anchorNode = null;
+
         frame = arFragment.getArSceneView().getArFrame();
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
         for (AugmentedImage augmentedImage : augmentedImages) {
@@ -156,8 +161,8 @@ public class FrameOperations {
                 if (augmentedImage.getName().contains("earth") && shouldAddModel) {
                     Toast.makeText(context, "Detected Image!!", Toast.LENGTH_LONG).show();
                     //placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("potted_plant.sfb"));
-                    AnchorNode anchorNode = new AnchorNode( augmentedImage.createAnchor(augmentedImage.getCenterPose()) );
-                    resultNode = new Node();
+                    anchorNode = new AnchorNode( augmentedImage.createAnchor(augmentedImage.getCenterPose()) );
+                    Node resultNode = new Node();
                     resultNode.setParent(anchorNode);
                     resultNode.setRenderable(textRenderable2);
                     resultNode.setLocalPosition(new Vector3(-0.5f*augmentedImage.getCenterPose().qx(), -0.5f*augmentedImage.getCenterPose().qy(), -0.5f * augmentedImage.getCenterPose().qz() ));
@@ -196,7 +201,11 @@ public class FrameOperations {
                 }
             }
         } //end of for loop: for each recognized AugmentedImage the above for loop logic executes at least once
-        return resultNode; //not necessary as the meta app now does not take the return value from the processFrame method
+
+        if (anchorNode != null) {
+            anchorNode.setParent(arFragment.getArSceneView().getScene());
+            pluginObjects.add(anchorNode);
+        }
     }
 
     public boolean setupAugmentedImagesDb(Config config, Session session) {
