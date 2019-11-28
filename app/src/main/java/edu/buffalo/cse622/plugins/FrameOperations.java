@@ -98,6 +98,15 @@ public class FrameOperations {
 
         setupAugmentedImagesDb(config, session);
 
+        // UNNECESSARY NEW STUFF <<<<<<<<<>>>>>>>>>>>>>>>>>
+        /*
+        ResolveDialogFragment rd = new ResolveDialogFragment();
+        rd.partiksSetup(arFragment.getActivity(), context);
+        rd.show(arFragment.getFragmentManager(), "Resolve");
+        //rd.onPartiksCreate(arFragment.getActivity(), context);
+
+        // NEW STUFF OVER <<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>> */
+
     }
 
     private Node processFrame(Frame frame) {
@@ -123,6 +132,7 @@ public class FrameOperations {
                     }else { */
                         Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
                         bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
+                        bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
                         bookInfoNode = new Node();
                         bookInfoNode.setParent(bookAnchor);
                         bookInfoNode.setRenderable(textRenderable);
@@ -133,8 +143,9 @@ public class FrameOperations {
                         //tv.setMovementMethod(LinkMovementMethod.getInstance());
 
                         //getting the URL from the strings.xml values file
-                        int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
-                        tv.setText(dynamicResources.getString(stringId));
+                        //int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
+                        CloudAnchorManager cam = new CloudAnchorManager();
+                        tv.setText( cam.partiksTest() );
                         //getting the rounded background textbox from rounded_bg.xml layout file
                         int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
                         Drawable background;
@@ -205,6 +216,7 @@ public class FrameOperations {
         try {
             //new way of loading things without the integer ID
             InputStream is = dynamicResources.getAssets().open("partiks_books_img_database.imgdb");
+
             augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
         } catch (IOException e) {
             e.printStackTrace();
