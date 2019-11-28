@@ -106,7 +106,6 @@ public class FrameOperations {
 
     private void processFrame(Frame frame) {
         Log.e(PTAG, "///////////////////////////////////// PROCESS FRAME IN PLUGIN CALLED");
-        AnchorNode anchorNode = null;
 
         frame = arFragment.getArSceneView().getArFrame();
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
@@ -150,42 +149,8 @@ public class FrameOperations {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        //adding node to scene
-                        arFragment.getArSceneView().getScene().addChild(bookInfoNode);
                     }
 
-                }
-
-                // CORE LOGIC OVER ----------------------->
-                //below "if" part not really important as it's for default earth image
-                if (augmentedImage.getName().contains("earth") && shouldAddModel) {
-                    Toast.makeText(context, "Detected Image!!", Toast.LENGTH_LONG).show();
-                    //placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("potted_plant.sfb"));
-                    anchorNode = new AnchorNode( augmentedImage.createAnchor(augmentedImage.getCenterPose()) );
-                    Node resultNode = new Node();
-                    resultNode.setParent(anchorNode);
-                    resultNode.setRenderable(textRenderable2);
-                    resultNode.setLocalPosition(new Vector3(-0.5f*augmentedImage.getCenterPose().qx(), -0.5f*augmentedImage.getCenterPose().qy(), -0.5f * augmentedImage.getCenterPose().qz() ));
-                    resultNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
-
-                    TextView tv = (TextView) textRenderable2.getView();
-
-                    //tv.setBackgroundColor(Color.parseColor("#0000FF"));
-                    //#228B22
-                    int stringId = dynamicResources.getIdentifier("planet", "string", "edu.buffalo.cse622.plugins");
-                    tv.setText(dynamicResources.getString(stringId));
-                    int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
-                    Drawable background;
-                    try {
-                        background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
-                        tv.setBackground(background);
-                        tv.setBackgroundColor(Color.parseColor("#228B22"));
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                    arFragment.getArSceneView().getScene().addChild(resultNode);
-
-                    shouldAddModel = false;
                 }
             }
             //still testing out this logic, not sure this works smoothly
@@ -202,9 +167,9 @@ public class FrameOperations {
             }
         } //end of for loop: for each recognized AugmentedImage the above for loop logic executes at least once
 
-        if (anchorNode != null) {
-            anchorNode.setParent(arFragment.getArSceneView().getScene());
-            pluginObjects.add(anchorNode);
+        if (bookAnchor != null) {
+            bookAnchor.setParent(arFragment.getArSceneView().getScene());
+            pluginObjects.add(bookAnchor);
         }
     }
 
