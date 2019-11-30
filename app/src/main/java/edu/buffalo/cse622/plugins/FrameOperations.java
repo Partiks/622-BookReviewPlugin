@@ -143,16 +143,21 @@ public class FrameOperations {
                         bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
 
                         TextView tv = (TextView) textRenderable.getView();
+                        /*//clickable link working V1.0
                         String bookText="Some Text <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'>Goodreads review </a>";
                         tv.setText(HtmlCompat.fromHtml(bookText, HtmlCompat.FROM_HTML_MODE_LEGACY) );
-
                         tv.setMovementMethod(LinkMovementMethod.getInstance());
+                        // clickable links work end */
 
                         //getting the URL from the strings.xml values file
+                        Log.e(PTAG, "ANCHOR BREAKPOINT <<<<<<<<<<>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>");
                         int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
+                        //tv.setText(dynamicResources.getString(stringId));
+                        tv.setText(dynamicResources.getText(stringId)); //stringId would be textId
+                        tv.setMovementMethod(LinkMovementMethod.getInstance());
+
                         //SpannableString spanStr = new SpannableString(dynamicResources.getString(stringId) );
                         //tv.setAutoLinkMask(0);
-                        //tv.setText(dynamicResources.getString(stringId));
 
                         //getting the rounded background textbox from rounded_bg.xml layout file
                         int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
