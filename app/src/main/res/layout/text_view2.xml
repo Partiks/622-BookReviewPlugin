@@ -3,12 +3,11 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:background="@color/design_default_color_primary"
+
     android:gravity="center"
+
     android:orientation="vertical"
     android:padding="6dp"
-
-    android:autoLink="web"
-    android:linksClickable="true"
-    android:text="LOLPO"
+    android:text="BAULO"
     android:textAlignment="center" />
+    <!-- android:background="#98EE9D" -->

@@ -41,8 +41,11 @@ public class FrameOperations {
 
     Boolean shouldAddModel=true;
     private ViewRenderable textRenderable;
+    private ViewRenderable textRenderable2;
     AnchorNode bookAnchor;
     Node bookInfoNode;
+    AnchorNode sreBookAnchor;
+    Node sreBookInfoNode;
 
 
     public FrameOperations(Resources dynamicResources2, ArFragment arFragment2, HashSet<AnchorNode> pluginObjects){
@@ -69,6 +72,15 @@ public class FrameOperations {
                         }
                 );
 
+        ViewRenderable.builder()
+                .setView(context, view2)
+                .build()
+                .thenAccept(
+                        (renderable) -> {
+                            textRenderable2 = renderable;
+                        }
+                );
+
         Log.e("TEST Loading", "Constructor called");
 
         Session session = arFragment.getArSceneView().getSession();
@@ -86,75 +98,121 @@ public class FrameOperations {
     }
 
     private void processFrame(Frame frame) {
-        Log.e(PTAG, "///////////////////////////////////// PROCESS FRAME IN PLUGIN CALLED");
+        //Log.e(PTAG, "///////////////////////////////////// PROCESS FRAME IN PLUGIN CALLED");
 
         frame = arFragment.getArSceneView().getArFrame();
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
+        // who will cry when you die book height: 18cm and width: 12 cm
+        // sre book width: ~19 cm and height = ~23 cms
         for (AugmentedImage augmentedImage : augmentedImages) {
-
             switch (augmentedImage.getTrackingState()){
+
                 case TRACKING:
                     if(augmentedImage.getTrackingMethod() == AugmentedImage.TrackingMethod.FULL_TRACKING){
-                        // enable book card node
-                        if(bookInfoNode == null){
-                            //only add if book was not recognized before
-                            // @TODO: smooth out image tracking logic by looking at AugmentedImages Samples
-                            // who will cry when you die book height: 18cm and width: 12 cm
-                            float imageWidth = 0.12f;
-                            float imageHeight = 0.18f;
 
-                            float scaledWidth = imageWidth/augmentedImage.getExtentX();
-                            float scaledHeight = imageHeight/augmentedImage.getExtentZ();
+                        if(augmentedImage.getName().equals("who-will-cry-when-you-die")){
+                            // enable book card node
+                            if(bookInfoNode == null){
+                                //only add if book was not recognized before
 
-                            Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
-                            bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
-                            bookInfoNode = new Node();
-                            bookInfoNode.setParent(bookAnchor);
-                            textRenderable.setShadowCaster(false);
-                            textRenderable.setShadowReceiver(false);
-                            bookInfoNode.setRenderable(textRenderable);
-                            bookInfoNode.setLocalScale(new Vector3(scaledWidth/4, scaledHeight/4, scaledWidth/4));
-                            bookInfoNode.setLocalPosition(new Vector3(0.01f*augmentedImage.getCenterPose().qx(), 0.25f* augmentedImage.getCenterPose().qy(), 1.8f*augmentedImage.getCenterPose().qz()));
-                            bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
+                                float imageWidth = 0.12f;
+                                float imageHeight = 0.18f;
 
-                            TextView tv = (TextView) textRenderable.getView();
+                                float scaledWidth = imageWidth/augmentedImage.getExtentX();
+                                float scaledHeight = imageHeight/augmentedImage.getExtentZ();
 
-                            //getting the text content and URL from the strings.xml values file
-                            int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
-                            tv.setText(dynamicResources.getText(stringId));
-                            tv.setMovementMethod(LinkMovementMethod.getInstance());
-                            tv.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+                                Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
+                                bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
+                                bookInfoNode = new Node();
+                                bookInfoNode.setParent(bookAnchor);
+                                textRenderable.setShadowCaster(false);
+                                textRenderable.setShadowReceiver(false);
+                                bookInfoNode.setRenderable(textRenderable);
+                                bookInfoNode.setLocalScale(new Vector3(scaledWidth/4, scaledHeight/4, scaledWidth/4));
+                                bookInfoNode.setLocalPosition(new Vector3(0.01f*augmentedImage.getCenterPose().qx(), 0.25f* augmentedImage.getCenterPose().qy(), 1.8f*augmentedImage.getCenterPose().qz()));
+                                bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
 
-                            //getting the rounded background textbox from rounded_bg.xml layout file
-                            int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
-                            Drawable background;
-                            try {
-                                background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
-                                tv.setBackground(background);
-                                //tv.setBackgroundColor(Color.parseColor("#228B22"));
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                TextView tv = (TextView) textRenderable.getView();
+
+                                //getting the text content and URL from the strings.xml values file
+                                int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
+                                tv.setText(dynamicResources.getText(stringId));
+                                tv.setMovementMethod(LinkMovementMethod.getInstance());
+                                tv.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+
+                                //getting the rounded background textbox from green_rounded_bg.xml layout file
+                                int bgId = dynamicResources.getIdentifier("green_rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
+                                Drawable background;
+                                try {
+                                    background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
+                                    tv.setBackground(background);
+                                    //tv.setBackgroundColor(Color.parseColor("#228B22"));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }else if(augmentedImage.getName().equals("sre-book")){
+                            //Log.e(PTAG, "SRE BOOK DETECTED <<<<<<<<<>>>>>>>>>>><<<<<<<<<<>>>>>>>>>>>>>");
+                            // enable sre book card node
+                            if(sreBookInfoNode == null){
+                                //only add if book was not recognized before
+
+                                float imageWidth = 0.19f;
+                                float imageHeight = 0.23f;
+
+                                float scaledWidth = imageWidth/augmentedImage.getExtentX();
+                                float scaledHeight = imageHeight/augmentedImage.getExtentZ();
+
+                                sreBookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
+                                sreBookInfoNode = new Node();
+                                sreBookInfoNode.setParent(sreBookAnchor);
+                                textRenderable2.setShadowCaster(false);
+                                textRenderable2.setShadowReceiver(false);
+                                sreBookInfoNode.setRenderable(textRenderable2);
+                                sreBookInfoNode.setLocalScale(new Vector3(scaledWidth/4, scaledHeight/4, scaledWidth/4));
+                                sreBookInfoNode.setLocalPosition(new Vector3(0.01f*augmentedImage.getCenterPose().qx(), 0.25f* augmentedImage.getCenterPose().qy(), 1.8f*augmentedImage.getCenterPose().qz()));
+                                sreBookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
+                                Toast.makeText(context, "Configured Book Node", Toast.LENGTH_LONG);
+
+                                TextView tv = (TextView) textRenderable2.getView();
+
+                                //getting the text content and URL from the strings.xml values file
+                                int stringId = dynamicResources.getIdentifier("book_sre", "string", "edu.buffalo.cse622.plugins");
+                                tv.setText(dynamicResources.getText(stringId));
+                                tv.setMovementMethod(LinkMovementMethod.getInstance());
+                                tv.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+
+                                //getting the rounded background textbox from green_rounded_bg.xml layout file
+                                int bgId = dynamicResources.getIdentifier("blue_rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
+                                Drawable background;
+                                try {
+                                    background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
+                                    tv.setBackground(background);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
+                        else if(augmentedImage.getName().equals("earth")){
+
+                        }
+
                     }else{
 
                     }
             }
-
-            /*if (augmentedImage.getTrackingState() == TrackingState.TRACKING && augmentedImage.getTrackingMethod() == AugmentedImage.TrackingMethod.FULL_TRACKING) {
-                //only looking for images in tracking state
-                Log.e(PTAG, "/////////////////////////////////////////Augmented Image name = " + augmentedImage.getName() + " " + augmentedImage.getIndex());
-                // CORE LOGIC START ----------------------->
-                if(augmentedImage.getName().equals("who-will-cry-when-you-die.jpg")){
-
-                }
-            } */
 
         } //end of for loop: for each recognized AugmentedImage the above for loop logic executes at least once
 
         if (bookAnchor != null) {
             bookAnchor.setParent(arFragment.getArSceneView().getScene());
             pluginObjects.add(bookAnchor);
+        }
+        if (sreBookAnchor != null) {
+            Log.e(PTAG, "ADDED SRE BOOK TO THE SCENE");
+            Toast.makeText(context, "ADDED SRE Book To Scene", Toast.LENGTH_LONG);
+            sreBookAnchor.setParent(arFragment.getArSceneView().getScene());
+            pluginObjects.add(sreBookAnchor);
         }
     }
 
@@ -228,7 +286,7 @@ public class FrameOperations {
                 //#228B22
                 int stringId = dynamicResources.getIdentifier("partiks_hello", "string", "edu.buffalo.cse622.plugins");
                 tv.setText(dynamicResources.getString(stringId));
-                int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
+                int bgId = dynamicResources.getIdentifier("green_rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
                 Drawable background;
                 try {
                     background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
