@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.text.Layout;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,6 +79,9 @@ public class FrameOperations {
         arFragment.getArSceneView().setupSession(session);
 
         setupAugmentedImagesDb(config, session);
+        arFragment.getPlaneDiscoveryController().hide();
+        arFragment.getPlaneDiscoveryController().setInstructionView(null);
+        arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
 
     }
 
@@ -87,54 +91,65 @@ public class FrameOperations {
         frame = arFragment.getArSceneView().getArFrame();
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
         for (AugmentedImage augmentedImage : augmentedImages) {
-            if (augmentedImage.getTrackingState() == TrackingState.TRACKING) {
+
+            switch (augmentedImage.getTrackingState()){
+                case TRACKING:
+                    if(augmentedImage.getTrackingMethod() == AugmentedImage.TrackingMethod.FULL_TRACKING){
+                        // enable book card node
+                        if(bookInfoNode == null){
+                            //only add if book was not recognized before
+                            // @TODO: smooth out image tracking logic by looking at AugmentedImages Samples
+                            // who will cry when you die book height: 18cm and width: 12 cm
+                            float imageWidth = 0.12f;
+                            float imageHeight = 0.18f;
+
+                            float scaledWidth = imageWidth/augmentedImage.getExtentX();
+                            float scaledHeight = imageHeight/augmentedImage.getExtentZ();
+
+                            Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
+                            bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
+                            bookInfoNode = new Node();
+                            bookInfoNode.setParent(bookAnchor);
+                            textRenderable.setShadowCaster(false);
+                            textRenderable.setShadowReceiver(false);
+                            bookInfoNode.setRenderable(textRenderable);
+                            bookInfoNode.setLocalScale(new Vector3(scaledWidth/4, scaledHeight/4, scaledWidth/4));
+                            bookInfoNode.setLocalPosition(new Vector3(0.01f*augmentedImage.getCenterPose().qx(), 0.25f* augmentedImage.getCenterPose().qy(), 1.8f*augmentedImage.getCenterPose().qz()));
+                            bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
+
+                            TextView tv = (TextView) textRenderable.getView();
+
+                            //getting the text content and URL from the strings.xml values file
+                            int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
+                            tv.setText(dynamicResources.getText(stringId));
+                            tv.setMovementMethod(LinkMovementMethod.getInstance());
+                            tv.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+
+                            //getting the rounded background textbox from rounded_bg.xml layout file
+                            int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
+                            Drawable background;
+                            try {
+                                background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
+                                tv.setBackground(background);
+                                //tv.setBackgroundColor(Color.parseColor("#228B22"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }else{
+
+                    }
+            }
+
+            /*if (augmentedImage.getTrackingState() == TrackingState.TRACKING && augmentedImage.getTrackingMethod() == AugmentedImage.TrackingMethod.FULL_TRACKING) {
                 //only looking for images in tracking state
                 Log.e(PTAG, "/////////////////////////////////////////Augmented Image name = " + augmentedImage.getName() + " " + augmentedImage.getIndex());
                 // CORE LOGIC START ----------------------->
-                if(augmentedImage.getName().contains("cry")){
-                    //identifying which image got recognized, more useful to match the whole image name rather than "contains"
-                    // @TODO: use whole image matching instead of using conatins
-                    if(bookInfoNode == null){
-                        //only add if book was not recognized before
-                        // @TODO: smooth out image tracking logic by looking at AugmentedImages Samples
-                        Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
-                        bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
-                        bookInfoNode = new Node();
-                        bookInfoNode.setParent(bookAnchor);
-                        bookInfoNode.setRenderable(textRenderable);
-                        bookInfoNode.setLocalPosition(new Vector3(0.5f * augmentedImage.getCenterPose().qx(), augmentedImage.getCenterPose().qy(), -0.5f * augmentedImage.getCenterPose().qz()));
-                        bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
+                if(augmentedImage.getName().equals("who-will-cry-when-you-die.jpg")){
 
-                        TextView tv = (TextView) textRenderable.getView();
-
-                        //getting the URL from the strings.xml values file
-                        Log.e(PTAG, "ANCHOR BREAKPOINT <<<<<<<<<<>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>");
-                        int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
-                        tv.setText(dynamicResources.getText(stringId));
-                        tv.setMovementMethod(LinkMovementMethod.getInstance());
-
-                        //getting the rounded background textbox from rounded_bg.xml layout file
-                        int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
-                        Drawable background;
-                        try {
-                            background = Drawable.createFromXml(dynamicResources, dynamicResources.getXml(bgId));
-                            tv.setBackground(background);
-                            //tv.setBackgroundColor(Color.parseColor("#228B22"));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
-            }
-            //still testing out this logic, not sure this works smoothly
-            if(augmentedImage.getTrackingState() == TrackingState.STOPPED){
-                if(augmentedImage.getName().contains("cry")){
-                    arFragment.getArSceneView().getScene().removeChild(bookAnchor);
-                    arFragment.getArSceneView().getScene().removeChild(bookInfoNode);
-                    bookAnchor = null;
-                    bookInfoNode=null;
-                }
-            }
+            } */
+
         } //end of for loop: for each recognized AugmentedImage the above for loop logic executes at least once
 
         if (bookAnchor != null) {

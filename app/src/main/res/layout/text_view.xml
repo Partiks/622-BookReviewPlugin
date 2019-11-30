@@ -4,10 +4,10 @@
     android:layout_height="wrap_content"
     android:layout_weight="1"
 
-    android:background="#98EE9D"
     android:gravity="center"
 
     android:orientation="vertical"
     android:padding="6dp"
     android:text="LOLPO"
     android:textAlignment="center" />
+<!-- android:background="#98EE9D" -->

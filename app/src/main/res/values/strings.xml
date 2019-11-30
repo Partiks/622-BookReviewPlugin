@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">APK_AR_Image_1</string>
-    <string name="partiks_hello">PARTIKS</string>
+    <string name="app_name">BookReviewPlugin</string>
     <string name="planet">APK EARTH</string>
-     <string name="book_who_will_cry">Same OLD <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'>Goodreads review</a></string>
-</resources>
+    <string name="book_who_will_cry">Third book in the series\n<i>The Monk who sold his Ferrari</i>\n
+        Originally Published: 1999\n
+        Genre: Self-help book\n
+        <a href='https://en.wikipedia.org/wiki/Who_Will_Cry_When_You_Die'> Wikipedia </a>   <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'> 4.5/5 Goodreads</a>
+    </string>
+        </resources>
