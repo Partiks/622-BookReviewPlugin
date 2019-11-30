@@ -9,12 +9,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.Html;
+import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.text.HtmlCompat;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
@@ -56,6 +60,7 @@ public class FrameOperations {
     Boolean shouldAddModel=true;
     private ViewRenderable textRenderable;
     private ViewRenderable textRenderable2;
+    private TextView bookTextView;
     AnchorNode bookAnchor;
     Node bookInfoNode;
 
@@ -70,6 +75,10 @@ public class FrameOperations {
         int layoutId = dynamicResources.getIdentifier("text_view", "layout", "edu.buffalo.cse622.plugins");
         XmlResourceParser textViewXml = dynamicResources.getLayout(layoutId);
         View view = LayoutInflater.from(context).inflate(textViewXml, null);
+        bookTextView = (TextView) view;
+        //bookTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        //bookTextView.setAutoLinkMask(0);
+
         layoutId = dynamicResources.getIdentifier("text_view2", "layout", "edu.buffalo.cse622.plugins");
         XmlResourceParser textViewXml2 = dynamicResources.getLayout(layoutId);
         View view2 = LayoutInflater.from(context).inflate(textViewXml2, null);
@@ -130,15 +139,21 @@ public class FrameOperations {
                         bookInfoNode = new Node();
                         bookInfoNode.setParent(bookAnchor);
                         bookInfoNode.setRenderable(textRenderable);
-                        bookInfoNode.setLocalPosition(new Vector3(0.5f * augmentedImage.getCenterPose().qx(), -2f * augmentedImage.getCenterPose().qy(), -0.5f * augmentedImage.getCenterPose().qz()));
+                        bookInfoNode.setLocalPosition(new Vector3(0.5f * augmentedImage.getCenterPose().qx(), augmentedImage.getCenterPose().qy(), -0.5f * augmentedImage.getCenterPose().qz()));
                         bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
 
                         TextView tv = (TextView) textRenderable.getView();
-                        //tv.setMovementMethod(LinkMovementMethod.getInstance());
+                        String bookText="Some Text <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'>Goodreads review </a>";
+                        tv.setText(HtmlCompat.fromHtml(bookText, HtmlCompat.FROM_HTML_MODE_LEGACY) );
+
+                        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
                         //getting the URL from the strings.xml values file
                         int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
-                        tv.setText(dynamicResources.getString(stringId));
+                        //SpannableString spanStr = new SpannableString(dynamicResources.getString(stringId) );
+                        //tv.setAutoLinkMask(0);
+                        //tv.setText(dynamicResources.getString(stringId));
+
                         //getting the rounded background textbox from rounded_bg.xml layout file
                         int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
                         Drawable background;
