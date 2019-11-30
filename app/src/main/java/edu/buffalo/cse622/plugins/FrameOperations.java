@@ -1,16 +1,9 @@
 package edu.buffalo.cse622.plugins;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.text.Html;
-import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,31 +11,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.text.HtmlCompat;
-
-import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.AugmentedImageDatabase;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
-import com.google.ar.core.Plane;
 import com.google.ar.core.Session;
 
 import com.google.ar.core.TrackingState;
-import com.google.ar.core.exceptions.UnavailableApkTooOldException;
-import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
-import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
-import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,8 +40,6 @@ public class FrameOperations {
 
     Boolean shouldAddModel=true;
     private ViewRenderable textRenderable;
-    private ViewRenderable textRenderable2;
-    private TextView bookTextView;
     AnchorNode bookAnchor;
     Node bookInfoNode;
 
@@ -75,9 +54,6 @@ public class FrameOperations {
         int layoutId = dynamicResources.getIdentifier("text_view", "layout", "edu.buffalo.cse622.plugins");
         XmlResourceParser textViewXml = dynamicResources.getLayout(layoutId);
         View view = LayoutInflater.from(context).inflate(textViewXml, null);
-        bookTextView = (TextView) view;
-        //bookTextView.setMovementMethod(LinkMovementMethod.getInstance());
-        //bookTextView.setAutoLinkMask(0);
 
         layoutId = dynamicResources.getIdentifier("text_view2", "layout", "edu.buffalo.cse622.plugins");
         XmlResourceParser textViewXml2 = dynamicResources.getLayout(layoutId);
@@ -89,14 +65,6 @@ public class FrameOperations {
                 .thenAccept(
                         (renderable) -> {
                             textRenderable = renderable;
-                        }
-                );
-        ViewRenderable.builder()
-                .setView(context, view2)
-                .build()
-                .thenAccept(
-                        (renderable) -> {
-                            textRenderable2 = renderable;
                         }
                 );
 
@@ -129,11 +97,6 @@ public class FrameOperations {
                     if(bookInfoNode == null){
                         //only add if book was not recognized before
                         // @TODO: smooth out image tracking logic by looking at AugmentedImages Samples
-                    /*    arFragment.getArSceneView().getScene().removeChild(bookAnchor);
-                        arFragment.getArSceneView().getScene().removeChild(bookInfoNode);
-                        bookAnchor = null;
-                        bookInfoNode=null;
-                    }else { */
                         Toast.makeText(context, "Detected BOOK!!", Toast.LENGTH_LONG).show();
                         bookAnchor = new AnchorNode(augmentedImage.createAnchor(augmentedImage.getCenterPose()));
                         bookInfoNode = new Node();
@@ -143,21 +106,12 @@ public class FrameOperations {
                         bookInfoNode.setLocalRotation(Quaternion.axisAngle(new Vector3(-1f, 0, 0), 90f));
 
                         TextView tv = (TextView) textRenderable.getView();
-                        /*//clickable link working V1.0
-                        String bookText="Some Text <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'>Goodreads review </a>";
-                        tv.setText(HtmlCompat.fromHtml(bookText, HtmlCompat.FROM_HTML_MODE_LEGACY) );
-                        tv.setMovementMethod(LinkMovementMethod.getInstance());
-                        // clickable links work end */
 
                         //getting the URL from the strings.xml values file
                         Log.e(PTAG, "ANCHOR BREAKPOINT <<<<<<<<<<>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>");
                         int stringId = dynamicResources.getIdentifier("book_who_will_cry", "string", "edu.buffalo.cse622.plugins");
-                        //tv.setText(dynamicResources.getString(stringId));
-                        tv.setText(dynamicResources.getText(stringId)); //stringId would be textId
+                        tv.setText(dynamicResources.getText(stringId));
                         tv.setMovementMethod(LinkMovementMethod.getInstance());
-
-                        //SpannableString spanStr = new SpannableString(dynamicResources.getString(stringId) );
-                        //tv.setAutoLinkMask(0);
 
                         //getting the rounded background textbox from rounded_bg.xml layout file
                         int bgId = dynamicResources.getIdentifier("rounded_bg", "drawable", "edu.buffalo.cse622.plugins");
@@ -170,14 +124,10 @@ public class FrameOperations {
                             e.printStackTrace();
                         }
                     }
-
                 }
             }
             //still testing out this logic, not sure this works smoothly
             if(augmentedImage.getTrackingState() == TrackingState.STOPPED){
-                if(augmentedImage.getName().contains("earth")){
-                    shouldAddModel=true;
-                }
                 if(augmentedImage.getName().contains("cry")){
                     arFragment.getArSceneView().getScene().removeChild(bookAnchor);
                     arFragment.getArSceneView().getScene().removeChild(bookInfoNode);

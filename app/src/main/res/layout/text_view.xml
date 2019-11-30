@@ -7,12 +7,7 @@
     android:background="#98EE9D"
     android:gravity="center"
 
-
-
-
-
     android:orientation="vertical"
     android:padding="6dp"
     android:text="LOLPO"
     android:textAlignment="center" />
-    <!-- android:clickable="true"-->
