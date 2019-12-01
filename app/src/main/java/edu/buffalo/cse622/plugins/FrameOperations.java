@@ -198,7 +198,22 @@ public class FrameOperations {
                         }
 
                     }else{
+                        // remove this object's anchor node
+                        if(augmentedImage.getName().equals("who-will-cry-when-you-die")){
+                            arFragment.getArSceneView().getScene().removeChild(bookInfoNode);
+                            bookInfoNode=null;
+                            arFragment.getArSceneView().getScene().removeChild(bookAnchor);
+                            bookAnchor=null;
+                        }
+                        if(augmentedImage.getName().equals("sre-book")){
+                            arFragment.getArSceneView().getScene().removeChild(sreBookInfoNode);
+                            arFragment.getArSceneView().getScene().removeChild(sreBookAnchor);
+                            sreBookInfoNode=null;
+                            sreBookAnchor=null;
+                        }
+                        if(augmentedImage.getName().equals("earth")){
 
+                        }
                     }
             }
 
