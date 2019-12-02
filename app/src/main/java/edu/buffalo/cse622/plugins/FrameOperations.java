@@ -1,8 +1,11 @@
 package edu.buffalo.cse622.plugins;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.method.LinkMovementMethod;
@@ -16,6 +19,7 @@ import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.AugmentedImageDatabase;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Session;
 
 import com.google.ar.core.TrackingState;
@@ -33,7 +37,7 @@ import java.util.HashSet;
 
 public class FrameOperations {
 
-    private static final String PTAG = "PartiksTag";
+    private static final String TAG = "BookReviewPlugin:" + FrameOperations.class.getSimpleName();
     ArFragment arFragment;
     Resources dynamicResources;
     Context context;
@@ -84,17 +88,8 @@ public class FrameOperations {
         Log.e("TEST Loading", "Constructor called");
 
         Session session = arFragment.getArSceneView().getSession();
-
-        Config config = new Config(session);
-        config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
-        session.configure(config);
-        arFragment.getArSceneView().setupSession(session);
-
+        Config config = session.getConfig();
         setupAugmentedImagesDb(config, session);
-        arFragment.getPlaneDiscoveryController().hide();
-        arFragment.getPlaneDiscoveryController().setInstructionView(null);
-        arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
-
     }
 
     private void processFrame(Frame frame) {
@@ -224,14 +219,43 @@ public class FrameOperations {
             pluginObjects.add(bookAnchor);
         }
         if (sreBookAnchor != null) {
-            Log.e(PTAG, "ADDED SRE BOOK TO THE SCENE");
+            Log.e(TAG, "ADDED SRE BOOK TO THE SCENE");
             Toast.makeText(context, "ADDED SRE Book To Scene", Toast.LENGTH_LONG);
             sreBookAnchor.setParent(arFragment.getArSceneView().getScene());
             pluginObjects.add(sreBookAnchor);
         }
     }
 
+    private void planeTap(HitResult hitResult) {
+    }
+
+    private void onDestroy() {
+    }
+
     public boolean setupAugmentedImagesDb(Config config, Session session) {
+        AugmentedImageDatabase augmentedImageDatabase = config.getAugmentedImageDatabase();
+
+        Bitmap bitmap1 = loadAugmentedImage("who-will-cry-when-you-die.jpg");
+        if (bitmap1 == null) {
+            return false;
+        }
+
+        augmentedImageDatabase.addImage("who-will-cry-when-you-die", bitmap1);
+        config.setAugmentedImageDatabase(augmentedImageDatabase);
+
+        Bitmap bitmap2 = loadAugmentedImage("sre-book.jpg");
+        if (bitmap2 == null) {
+            return false;
+        }
+
+        augmentedImageDatabase.addImage("sre-book", bitmap2);
+        config.setAugmentedImageDatabase(augmentedImageDatabase);
+
+        session.configure(config);
+
+        return true;
+
+        /*
         // CORE LOGIC START ----------------------->
         AugmentedImageDatabase augmentedImageDatabase;
         try {
@@ -253,8 +277,19 @@ public class FrameOperations {
         session.configure(config);
 
         return true;
+        */
     }
 
+    private Bitmap loadAugmentedImage(String fileName) {
+        try {
+            AssetManager assetManager = dynamicResources.getAssets();
+            InputStream is = assetManager.open(fileName);
+            return BitmapFactory.decodeStream(is);
+        } catch (IOException e) {
+            Log.e(TAG, "loadAugmentedImage: " + "IO Exception", e);
+        }
+        return null;
+    }
 // -------------- BOX OPERATIONS BASIC TEST PLUGINS -----------------
 // BELOW CODE NOT USED IN BOOK REVIEW PLUGIN
     /*public FrameOperations( Resources dynamicResources2, ArFragment arFragment2){
