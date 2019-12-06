@@ -1,16 +1,26 @@
 <resources>
     <string name="app_name">BookReviewPlugin</string>
     <string name="planet">EARTH</string>
-    <string name="book_who_will_cry">Third book in the series\n<i>The Monk who sold his Ferrari</i>\n
+    <string name="book_who_will_cry">
+        Third book in the series\n
+        <i>The Monk who sold his Ferrari</i>\n
         Originally Published: 1999\n
         Genre: Self-help book\n
         <a href='https://en.wikipedia.org/wiki/Who_Will_Cry_When_You_Die'> Wikipedia </a>   <a href='https://www.goodreads.com/en/book/show/40397117-who-will-cry-when-you-die'> 4.5/5 Goodreads</a>
     </string>
-    <string name="book_sre">Collection of essays and articles by key\n
+    <string name="book_sre">
+        Collection of essays and articles by key\n
         members of Google\'s Site Reliability Team.\n
         Originally Published: March 23, 2016\n
-        Genre: Systems Administration\n
+        Genre: IT Systems Administration\n
         <a href='https://www.goodreads.com/en/book/show/27968891'>4.2/5 Goodreads</a>
+    </string>
+    <string name="book_those_we_left_behind">
+        Story of two brothers in foster home\n
+        and their impact on people around them\n
+        Originally Published: 2015\n
+        Genres: Fiction, Mystery, Thriller\n
+        <a href='https://www.goodreads.com/book/show/25279684-those-we-left-behind'>3.8/5 Goodreads</a>
     </string>
 
 

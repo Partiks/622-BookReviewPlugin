@@ -1,4 +1,0 @@
-earth|/home/partiks/622-UbuntuARAppProjects/BookReviewPlugin/parth_book_reviews_plugin/ARImages/earth.jpg
-niagara-falls|/home/partiks/622-UbuntuARAppProjects/BookReviewPlugin/parth_book_reviews_plugin/ARImages/niagara-falls.jpg
-who-will-cry-when-you-die|/home/partiks/622-UbuntuARAppProjects/BookReviewPlugin/parth_book_reviews_plugin/ARImages/who-will-cry-when-you-die.jpg|0.12
-sre-book|/home/partiks/622-UbuntuARAppProjects/BookReviewPlugin/parth_book_reviews_plugin/ARImages/sre-book.jpg|0.19
