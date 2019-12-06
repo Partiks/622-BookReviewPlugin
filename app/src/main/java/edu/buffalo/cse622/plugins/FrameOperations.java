@@ -16,6 +16,7 @@ import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.AugmentedImageDatabase;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Session;
 
 import com.google.ar.core.TrackingState;
@@ -33,7 +34,7 @@ import java.util.HashSet;
 
 public class FrameOperations {
 
-    private static final String PTAG = "PartiksTag";
+    private static final String TAG = "BookReviewPlugin:";
     ArFragment arFragment;
     Resources dynamicResources;
     Context context;
@@ -100,15 +101,11 @@ public class FrameOperations {
         Session session = arFragment.getArSceneView().getSession();
 
         Config config = new Config(session);
-        config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
         config.setFocusMode(Config.FocusMode.AUTO);
         session.configure(config);
         arFragment.getArSceneView().setupSession(session);
 
         setupAugmentedImagesDb(config, session);
-        arFragment.getPlaneDiscoveryController().hide();
-        arFragment.getPlaneDiscoveryController().setInstructionView(null);
-        arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
 
     }
 
@@ -208,7 +205,7 @@ public class FrameOperations {
                         else if(augmentedImage.getName().equals("those-we-left-behind")){
                             if(thrillerBookInfoNode == null){
                                 //only add if book was not recognized before
-                                Log.e(PTAG, "THRILLER BOOK ADDING NODE<<<<<<<<<<>>>>>>>>>");
+                                Log.e(TAG, "THRILLER BOOK ADDING NODE<<<<<<<<<<>>>>>>>>>");
                                 float imageWidth = 0.14f;
                                 float imageHeight = 0.205f;
 
@@ -284,6 +281,14 @@ public class FrameOperations {
         }
     }
 
+    private void planeTap(HitResult hitResult) {
+
+    }
+
+    private void onDestroy() {
+
+    }
+
     public boolean setupAugmentedImagesDb(Config config, Session session) {
         AugmentedImageDatabase augmentedImageDatabase;
         try {
@@ -292,13 +297,13 @@ public class FrameOperations {
             augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(PTAG, "IO exception loading augmented image database.", e);
+            Log.e(TAG, "IO exception loading augmented image database.", e);
             return false;
         }
 
         config.setAugmentedImageDatabase(augmentedImageDatabase);
         //printing number of Augmented Images inside the DB to verify if everything is working fine.
-        Log.e(PTAG, "INSIDE APK SESSION DB CONTENTS = " + augmentedImageDatabase.getNumImages());
+        Log.e(TAG, "INSIDE APK SESSION DB CONTENTS = " + augmentedImageDatabase.getNumImages());
 
         session.configure(config);
 
