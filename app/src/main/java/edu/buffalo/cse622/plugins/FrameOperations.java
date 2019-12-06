@@ -98,14 +98,14 @@ public class FrameOperations {
                         }
                 );
 
-        Session session = arFragment.getArSceneView().getSession();
+        //Session session = arFragment.getArSceneView().getSession();
 
-        Config config = new Config(session);
-        config.setFocusMode(Config.FocusMode.AUTO);
-        session.configure(config);
-        arFragment.getArSceneView().setupSession(session);
+        //Config config = new Config(session);
+        //config.setFocusMode(Config.FocusMode.AUTO);
+        //session.configure(config);
+        //arFragment.getArSceneView().setupSession(session);
 
-        setupAugmentedImagesDb(config, session);
+        //setupAugmentedImagesDb(config, session);
 
     }
 
