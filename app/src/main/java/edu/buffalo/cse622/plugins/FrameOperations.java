@@ -1,8 +1,11 @@
 package edu.buffalo.cse622.plugins;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.method.LinkMovementMethod;
@@ -10,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.AugmentedImageDatabase;
@@ -19,7 +21,6 @@ import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Session;
 
-import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
@@ -32,7 +33,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class FrameOperations {
+public class FrameOperations implements Operations {
 
     private static final String TAG = "BookReviewPlugin:";
     ArFragment arFragment;
@@ -99,17 +100,11 @@ public class FrameOperations {
                 );
 
         Session session = arFragment.getArSceneView().getSession();
-
-        Config config = new Config(session);
-        config.setFocusMode(Config.FocusMode.AUTO);
-        session.configure(config);
-        arFragment.getArSceneView().setupSession(session);
-
+        Config config = session.getConfig();
         setupAugmentedImagesDb(config, session);
-
     }
 
-    private void processFrame(Frame frame) {
+    public void processFrame(Frame frame) {
 
         frame = arFragment.getArSceneView().getArFrame();
         Collection<AugmentedImage> augmentedImages = frame.getUpdatedTrackables(AugmentedImage.class);
@@ -267,47 +262,57 @@ public class FrameOperations {
 
         } //end of for loop: for each recognized AugmentedImage the above for loop logic executes at least once
 
-        if (bookAnchor != null) {
-            bookAnchor.setParent(arFragment.getArSceneView().getScene());
-            pluginObjects.add(bookAnchor);
-        }
-        if (sreBookAnchor != null) {
-            sreBookAnchor.setParent(arFragment.getArSceneView().getScene());
-            pluginObjects.add(sreBookAnchor);
-        }
-        if(thrillerBookAnchor!=null){
-            thrillerBookAnchor.setParent(arFragment.getArSceneView().getScene());
-            pluginObjects.add(thrillerBookAnchor);
-        }
+        renderObject(arFragment, pluginObjects, bookAnchor);
+        renderObject(arFragment, pluginObjects, sreBookAnchor);
+        renderObject(arFragment, pluginObjects, thrillerBookAnchor);
     }
 
-    private void planeTap(HitResult hitResult) {
+    public void planeTap(HitResult hitResult) {
 
     }
 
-    private void onDestroy() {
+    public void onDestroy() {
 
     }
 
-    public boolean setupAugmentedImagesDb(Config config, Session session) {
-        AugmentedImageDatabase augmentedImageDatabase;
-        try {
-            //new way of loading things without the integer ID
-            InputStream is = dynamicResources.getAssets().open("partiks_books_img_database.imgdb");
-            augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, "IO exception loading augmented image database.", e);
+    private boolean setupAugmentedImagesDb(Config config, Session session) {
+        AugmentedImageDatabase augmentedImageDatabase = config.getAugmentedImageDatabase();
+
+        Bitmap bitmap1 = loadAugmentedImage("who-will-cry-when-you-die.jpg");
+        if (bitmap1 == null) {
             return false;
         }
 
-        config.setAugmentedImageDatabase(augmentedImageDatabase);
-        //printing number of Augmented Images inside the DB to verify if everything is working fine.
-        Log.e(TAG, "INSIDE APK SESSION DB CONTENTS = " + augmentedImageDatabase.getNumImages());
+        augmentedImageDatabase.addImage("who-will-cry-when-you-die", bitmap1);
 
+        Bitmap bitmap2 = loadAugmentedImage("sre-book.jpg");
+        if (bitmap2 == null) {
+            return false;
+        }
+
+        augmentedImageDatabase.addImage("sre-book", bitmap2);
+
+        Bitmap bitmap3 = loadAugmentedImage("those-we-left-behind.jpg");
+        if (bitmap3 == null) {
+            return false;
+        }
+
+        augmentedImageDatabase.addImage("those-we-left-behind", bitmap3);
+
+        config.setAugmentedImageDatabase(augmentedImageDatabase);
         session.configure(config);
 
         return true;
     }
 
+    private Bitmap loadAugmentedImage(String fileName) {
+        try {
+            AssetManager assetManager = dynamicResources.getAssets();
+            InputStream is = assetManager.open(fileName);
+            return BitmapFactory.decodeStream(is);
+        } catch (IOException e) {
+            Log.e(TAG, "loadAugmentedImage: " + "IO Exception", e);
+        }
+        return null;
+    }
 }
